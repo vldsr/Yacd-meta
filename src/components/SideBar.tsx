@@ -7,15 +7,22 @@ import { FcAreaChart, FcDocument, FcGlobe, FcLink, FcRuler, FcSettings } from 'r
 import { useQuery } from 'react-query';
 import { Link, useLocation } from 'react-router-dom';
 
+import Select from '~/components/shared/Select';
 import { fetchVersion } from '~/api/version';
 import { ThemeSwitcher } from '~/components/shared/ThemeSwitcher';
 import { connect } from '~/components/StateProvider';
-import { getClashAPIConfig } from '~/store/app';
+import { getClashAPIConfig, getClashAPIConfigs, getSelectedClashAPIConfigIndex, selectClashAPIConfig } from '~/store/app';
 import { ClashAPIConfig } from '~/types';
 
 import s from './SideBar.module.scss';
+import { DispatchFn } from '~/store/types';
 
-type Props = { apiConfig: ClashAPIConfig };
+type Props = {
+  dispatch: DispatchFn;
+  apiConfig: ClashAPIConfig,
+  apiConfigs: ClashAPIConfig[],
+  apiIndex: number
+};
 
 const icons = {
   activity: FcAreaChart,
@@ -51,7 +58,7 @@ interface SideBarRowProps {
 
 const pages = [
   {
-    to: '/',
+    to: '/home',
     iconId: 'activity',
     labelText: 'Overview',
   },
@@ -84,6 +91,8 @@ const pages = [
 
 const mapState = (s) => ({
   apiConfig: getClashAPIConfig(s),
+  apiConfigs: getClashAPIConfigs(s),
+  apiIndex: getSelectedClashAPIConfigIndex(s),
 });
 
 export default connect(mapState)(SideBar);
@@ -95,9 +104,28 @@ function SideBar(props: Props) {
   const { data: version } = useQuery(['/version', props.apiConfig], () =>
     fetchVersion('/version', props.apiConfig)
   );
+
+  const handleApiChanged = (dispatch: DispatchFn, index) => {
+    const apiConfig = props.apiConfigs[index];
+    dispatch(selectClashAPIConfig({ baseURL: apiConfig.baseURL, secret: apiConfig.secret }));
+  };
+  const onChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => handleApiChanged(props.dispatch, e.target.value),
+    [props.dispatch]
+  );
+
+  const apis = (props.apiConfigs || []).map((config, index) => [index, config.alias ?? config.baseURL]);
+
   return (
     <div className={s.root}>
       <div className={version.meta && version.premium ? s.logo_singbox : s.logo_meta} />
+      <div className={`${s.row} ${s.api}`}>
+        <Select
+          options={apis}
+          selected={props.apiIndex}
+          onChange={onChange}
+          />
+      </div>
       <div className={s.rows}>
         {pages.map(({ to, iconId, labelText }) => (
           <SideBarRow

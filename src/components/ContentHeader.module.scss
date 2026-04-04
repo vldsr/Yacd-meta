@@ -4,17 +4,13 @@
   height: 60px;
   display: flex;
   align-items: center;
-  padding: 0 15px;
+  padding: 0 40px;
 
   @media (max-width: 768px) {
     min-height: 48px;
     height: auto;
     padding: 5px 15px;
     flex-wrap: wrap;
-  }
-
-  @media (--breakpoint-not-small) {
-    padding: 0 40px;
   }
 }
 

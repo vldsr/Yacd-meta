@@ -1,4 +1,5 @@
 export type ClashAPIConfig = {
+  alias?: string;
   baseURL: string;
   secret?: string;
 };

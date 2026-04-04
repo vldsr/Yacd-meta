@@ -14,7 +14,6 @@ type Props = {
 export default function Home({ apiConfig, selectedChartStyleIndex }: Props) {
   return (
     <div>
-      <ContentHeader />
       <div className={s0.root}>
         <TrafficNow apiConfig={apiConfig} selectedChartStyleIndex={selectedChartStyleIndex} />
       </div>
