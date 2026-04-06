@@ -1,7 +1,7 @@
 import './ConnectionTable.scss';
 
 import cx from 'clsx';
-import { formatDistance, Locale } from 'date-fns';
+import { formatDistanceStrict, Locale } from 'date-fns';
 import { enUS, zhCN, zhTW } from 'date-fns/locale';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowDown, ArrowUp, ChevronDown, Sliders, XCircle } from 'react-feather';
@@ -173,7 +173,7 @@ function Table({ data, columns, hiddenColumns, apiConfig, height }) {
             ></XCircle>
           );
         case 'start':
-          return formatDistance(cell.value, 0, { locale: locale });
+          return formatDistanceStrict(cell.value, 0, { locale: locale });
         case 'download':
         case 'upload':
           return prettyBytes(cell.value);
@@ -249,7 +249,9 @@ function Table({ data, columns, hiddenColumns, apiConfig, height }) {
                   ...columnStyle,
                 }}
               >
-                <span className={s.cellText}>{renderCell(cell, locale)}</span>
+                <span
+                  className={s.cellText}
+                  title={['host', 'rule', 'chains'].includes(cell.column.id) ? renderCell(cell, locale) : ""}>{renderCell(cell, locale)}</span>
               </div>
             );
           })}
